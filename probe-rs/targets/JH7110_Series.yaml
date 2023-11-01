@@ -1,0 +1,53 @@
+name: JH7110 Series
+manufacturer:
+  id: 0x06
+  cc: 0x7e
+  part: 0x7110
+  version: 0x0
+variants:
+- name: JH7110
+  cores:
+    - name: main
+      type: riscv
+      core_access_options:
+        !Riscv {}
+  memory_map:
+  - !Nvm
+    range:
+      start: 0x21000000
+      end: 0x21400000
+    is_boot_memory: true
+    cores:
+    - main
+  - !Ram
+    range:
+      start: 0x40000000
+      end: 0x23fffffff
+    is_boot_memory: false
+    cores:
+    - main
+  flash_algorithms:
+  - starfive-flashloader
+flash_algorithms:
+- name: starfive-flashloader
+  description: Flashloader for StarFive JH7110 VisionFive2
+  cores:
+    - main
+  default: true
+  instructions: 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
+  pc_init: 0x22
+  pc_uninit: 0x5e
+  pc_program_page: 0x74
+  pc_erase_sector: 0x296
+  data_section_offset: 0x33e98
+  flash_properties:
+    address_range:
+      start: 0x21000000
+      end: 0x21400000
+    page_size: 0x100
+    erased_byte_value: 0xff
+    program_page_timeout: 500
+    erase_sector_timeout: 500
+    sectors:
+    - size: 0x1000
+      address: 0
