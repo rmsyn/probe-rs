@@ -498,6 +498,7 @@ impl DebugProbe for FtdiProbe {
         } else {
             let known_idcodes = [
                 0x1000563d, // GD32VF103
+                0x07110cfd, // JH7110
             ];
             let idcode = taps
                 .iter()

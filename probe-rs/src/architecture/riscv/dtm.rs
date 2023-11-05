@@ -15,6 +15,39 @@ use crate::{
     DebugProbeError,
 };
 
+/// List of all DTM variants conforming to Debug Specication versions.
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum DtmVersion {
+    /// The debug module conforms to the version 0.11 of the RISCV Debug Specification.
+    Version0_11 = 0,
+    /// The debug module conforms to the version 0.13 of the RISCV Debug Specification.
+    Version0_13 = 1,
+    /// The debug module is present, but does not conform to any available version of the RISCV Debug Specification.
+    NonConforming = 15,
+    /// Unknown debug module version.
+    Unknown(u8),
+}
+
+impl From<u8> for DtmVersion {
+    fn from(raw: u8) -> Self {
+        match raw {
+            0 => Self::Version0_11,
+            // Some chips that support v0.13 (GDVF103, U74)
+            // seem to return `13` for `version`, TBD
+            1 | 13 => Self::Version0_13,
+            15 => Self::NonConforming,
+            other => Self::Unknown(other),
+        }
+    }
+}
+
+impl From<u32> for DtmVersion {
+    fn from(raw: u32) -> Self {
+        (raw as u8).into()
+    }
+}
+
 /// Access to the Debug Transport Module (DTM),
 /// which is used to communicate with the RISCV debug module.
 #[derive(Debug)]
@@ -49,11 +82,12 @@ impl Dtm {
 
         let abits = dtmcs.abits();
         let idle_cycles = dtmcs.idle();
+        let version = dtmcs.version();
 
-        if dtmcs.version() != 1 {
+        if DtmVersion::from(version) != DtmVersion::Version0_13 {
             return Err((
                 probe,
-                RiscvError::UnsupportedDebugTransportModuleVersion(dtmcs.version() as u8),
+                RiscvError::UnsupportedDebugTransportModuleVersion(version as u8),
             ));
         }
 
